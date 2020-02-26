@@ -135,12 +135,12 @@ def print_markdown(f, headinglist, indexstr=""):
         f.write(SLIDE_SINGLE_END)
         f.write(SLIDE_TOPIC_END)
 
-        if len(t.sub_headings) >= 2:
-            f.write(SLIDE_TOPIC_BEGIN)
-            f.write(SLIDE_SINGLE_BEGIN)
-            make_index(f, t)
-            f.write(SLIDE_SINGLE_END)
-            f.write(SLIDE_TOPIC_END)
+        # if len(t.sub_headings) >= 2:
+        #     f.write(SLIDE_TOPIC_BEGIN)
+        #     f.write(SLIDE_SINGLE_BEGIN)
+        #     make_index(f, t)
+        #     f.write(SLIDE_SINGLE_END)
+        #     f.write(SLIDE_TOPIC_END)
 
         if len(t.chapter_content) != 0:
             f.write(SLIDE_TOPIC_BEGIN)

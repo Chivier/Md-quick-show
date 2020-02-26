@@ -10,8 +10,6 @@ from typing import List
 #     </script>
 # </section>
 
-# todo: page seperating
-
 SLIDE_TOPIC_BEGIN = "<section>\n"
 SLIDE_TOPIC_END = "</section>\n"
 SLIDE_SINGLE_BEGIN = "<section data-markdown>\n<script type=\"text/template\">\n"
@@ -260,7 +258,6 @@ def print_content(f, list_to_print, indent=0):
             common_paragraph += 1
             continue
 
-        # todo: list item spreading
         if item["type"] == "list":
             print_list(f, item, indent)
             continue

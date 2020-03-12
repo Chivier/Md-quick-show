@@ -185,7 +185,6 @@ if __name__ == '__main__':
     print("Please input the name of Markdown:")
     filename = input("")
     print(filename)
-    # filename = "tst.md"
 
     os.system('remark --tree-out -o data.txt ' + filename)
 

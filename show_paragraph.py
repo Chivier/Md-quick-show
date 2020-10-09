@@ -12,33 +12,33 @@ from typing import List
 
 SLIDE_TOPIC_BEGIN = "<section>\n"
 SLIDE_TOPIC_END = "</section>\n"
-SLIDE_SINGLE_BEGIN = "<section data-markdown>\n<script type=\"text/template\">\n"
+SLIDE_SINGLE_BEGIN = '<section data-markdown>\n<script type="text/template">\n'
 SLIDE_SINGLE_END = "</script>\n</section>\n"
-HEAD_NOTE_BEGIN = "<font size=\"%d\"><p style = \"text-align: left;\" > "
+HEAD_NOTE_BEGIN = '<font size="%d"><p style = "text-align: left;" > '
 HEAD_NOTE_END = "</p>\n</font>"
 
 enumerate_count = 0
 
 
 def tmp_build_paragraph(js_list: List[dict]) -> str:
-    str = ''
+    str = ""
     for item in js_list:
-        if item['type'] == 'text':
-            str += item['value']
-        elif item['type'] == 'strong':
+        if item["type"] == "text":
+            str += item["value"]
+        elif item["type"] == "strong":
             str += f"**{tmp_build_paragraph(item['children'])}**"
-        elif item['type'] == 'emphasis':
+        elif item["type"] == "emphasis":
             str += f"*{tmp_build_paragraph(item['children'])}*"
-        elif item['type'] == 'delete':
+        elif item["type"] == "delete":
             str += f"~~{tmp_build_paragraph(item['children'])}~~"
-        elif item['type'] == 'image':
+        elif item["type"] == "image":
             str += f"![{item['alt']}]({tmp_get_link(item['url'])})"
-        elif item['type'] == 'link':
+        elif item["type"] == "link":
             str += f"[{tmp_build_paragraph(item['children'])}]({tmp_get_link(item['url'])})"
-        elif item['type'] == 'inlineCode':
+        elif item["type"] == "inlineCode":
             str += f"`{item['value']}`"
         else:
-            print(item['type'])
+            print(item["type"])
             assert False
     return str
 
@@ -80,8 +80,9 @@ def print_table(f, table_to_print, indent):
             else:
                 table_cell_text = table_cell["children"][0]
                 current_row.append(table_cell_text["value"])
-            max_length[current_id] = max(len(current_row[current_id]),
-                                         max_length[current_id])
+            max_length[current_id] = max(
+                len(current_row[current_id]), max_length[current_id]
+            )
             current_id += 1
         table_content.append(current_row)
 
@@ -89,27 +90,26 @@ def print_table(f, table_to_print, indent):
     current_row = 0
 
     while current_row < row_number:
-        f.write(SLIDE_SINGLE_END+"\n")
+        f.write(SLIDE_SINGLE_END + "\n")
         f.write(SLIDE_SINGLE_BEGIN)
 
         for i in range(indent):
-            f.write('    '+"")
-        f.write("|"+" ")
+            f.write("    " + "")
+        f.write("|" + " ")
         for current_id in range(column_num):
-            f.write(head_content[current_id].ljust(
-                max_length[current_id], ' ')+" | ")
+            f.write(head_content[current_id].ljust(max_length[current_id], " ") + " | ")
         f.write("\n")
 
         for i in range(indent):
-            f.write('    '+"")
-        f.write("|"+" ")
+            f.write("    " + "")
+        f.write("|" + " ")
         for current_id in range(column_num):
             alignstr = "-" * max_length[current_id]
-            if align_info[current_id] == 'left':
+            if align_info[current_id] == "left":
                 alignstr = ":" + "-" * (max_length[current_id] - 1)
             if align_info[current_id] == "right":
                 alignstr = "-" * (max_length[current_id] - 1) + ":"
-            f.write(alignstr+" | ")
+            f.write(alignstr + " | ")
         f.write("\n")
 
         for row_offset in range(6):
@@ -117,11 +117,10 @@ def print_table(f, table_to_print, indent):
                 break
             lines = table_content[current_row + row_offset]
             for i in range(indent):
-                f.write('    '+"")
-            f.write("|"+" ")
+                f.write("    " + "")
+            f.write("|" + " ")
             for current_id in range(column_num):
-                f.write(lines[current_id].ljust(
-                    max_length[current_id], ' ')+" | ")
+                f.write(lines[current_id].ljust(max_length[current_id], " ") + " | ")
             f.write("\n")
 
         current_row += 6
@@ -131,47 +130,47 @@ def print_table(f, table_to_print, indent):
 
 def print_list(f, list_to_print, indent):
     global enumerate_count
-    if enumerate_count == 6:
-        f.write(SLIDE_SINGLE_END+"\n")
-        f.write(SLIDE_SINGLE_BEGIN)
-        enumerate_count = 0
+    # if enumerate_count == 6:
+    #     f.write(SLIDE_SINGLE_END + "\n")
+    #     f.write(SLIDE_SINGLE_BEGIN)
+    #     enumerate_count = 0
 
     order_flag = list_to_print["ordered"]
     if order_flag:
         current_id = list_to_print["start"]
         for listitem in list_to_print["children"]:
             for i in range(indent):
-                f.write('    ')
-            f.write(str(current_id)+". ")
+                f.write("    ")
+            f.write(str(current_id) + ". ")
             current_id += 1
             enumerate_count += 1
             sublist = listitem["children"]
             print_content(f, [sublist[0]])
             del sublist[0]
             if not len(sublist) == 0:
-                print_content(f, sublist, indent+1)
+                print_content(f, sublist, indent + 1)
     else:
         for listitem in list_to_print["children"]:
             for i in range(indent):
-                f.write('    '+"")
+                f.write("    " + "")
             f.write("- ")
             enumerate_count += 1
             sublist = listitem["children"]
             print_content(f, [sublist[0]])
             del sublist[0]
             if not len(sublist) == 0:
-                print_content(f, sublist, indent+1)
+                print_content(f, sublist, indent + 1)
 
 
 def print_code(f, code_to_print):
     if len(code_to_print) > 1000:
-        f.write(SLIDE_SINGLE_END+"\n")
+        f.write(SLIDE_SINGLE_END + "\n")
         f.write(SLIDE_SINGLE_BEGIN)
 
     f.write("```")
-    f.write(code_to_print["lang"]+"\n")
-    f.write(code_to_print["value"]+"\n")
-    f.write("```"+"\n")
+    f.write(code_to_print["lang"] + "\n")
+    f.write(code_to_print["value"] + "\n")
+    f.write("```" + "\n")
 
 
 def print_content(f, list_to_print, indent=0):
@@ -189,29 +188,28 @@ def print_content(f, list_to_print, indent=0):
         if common_sentence > 10 or common_paragraph > 3:
             common_sentence = 0
             common_paragraph = 0
-            f.write(SLIDE_SINGLE_END+"\n")
+            f.write(SLIDE_SINGLE_END + "\n")
             f.write(SLIDE_SINGLE_BEGIN)
 
         if item["type"] == "text" or item["type"] == "html":
             for i in range(indent):
-                f.write('    ')
+                f.write("    ")
             f.write(item["value"])
             common_sentence += 1
             continue
 
         if item["type"] == "thematicBreak":
-            f.write(SLIDE_SINGLE_END+"\n")
+            f.write(SLIDE_SINGLE_END + "\n")
             f.write(SLIDE_SINGLE_BEGIN)
             common_paragraph = 0
             continue
 
         if item["type"] == "link":
-            alias_str = tmp_build_paragraph(item['children'])
+            alias_str = tmp_build_paragraph(item["children"])
             if alias_str == "":
-                alias_str = item['url']
+                alias_str = item["url"]
 
-            f.write(
-                f"[{alias_str}]({tmp_get_link(item['url'])})")
+            f.write(f"[{alias_str}]({tmp_get_link(item['url'])})")
             continue
 
         if item["type"] == "image":
@@ -220,7 +218,7 @@ def print_content(f, list_to_print, indent=0):
 
         if item["type"] == "strong":
             for i in range(indent):
-                f.write('    ')
+                f.write("    ")
             f.write("**")
             print_content(f, item["children"], indent)
             f.write("**")
@@ -228,31 +226,31 @@ def print_content(f, list_to_print, indent=0):
 
         if item["type"] == "delete":
             for i in range(indent):
-                f.write('    '+"")
-            f.write("~~"+"")
+                f.write("    " + "")
+            f.write("~~" + "")
             print_content(f, item["children"], indent)
-            f.write("~~"+"")
+            f.write("~~" + "")
             continue
 
         if item["type"] == "emphasis":
             for i in range(indent):
-                f.write('    '+"")
-            f.write("_"+"")
+                f.write("    " + "")
+            f.write("_" + "")
             print_content(f, item["children"], indent)
-            f.write("_"+"")
+            f.write("_" + "")
             continue
 
         if item["type"] == "inlineCode":
             for i in range(indent):
-                f.write('    '+"")
-            f.write("`"+"")
-            f.write(item["value"]+"")
-            f.write("`"+"")
+                f.write("    " + "")
+            f.write("`" + "")
+            f.write(item["value"] + "")
+            f.write("`" + "")
             continue
 
         if item["type"] == "paragraph":
             for i in range(indent):
-                f.write('    '+"")
+                f.write("    " + "")
             print_content(f, item["children"], indent)
             f.write("\n\n")
             common_paragraph += 1
@@ -268,8 +266,8 @@ def print_content(f, list_to_print, indent=0):
 
         if item["type"] == "blockquote":
             for i in range(indent):
-                f.write('    '+"")
-            f.write(">"+" ")
+                f.write("    " + "")
+            f.write(">" + " ")
             print_content(f, item["children"], indent)
             continue
 
